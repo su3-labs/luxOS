@@ -1,0 +1,18 @@
+[Unit]
+Description=SU(3) Raman MCP
+After=network.target
+
+[Service]
+User=luxos
+WorkingDirectory=/opt/su3-raman
+Environment=PYTHONPATH=/opt/su3-raman/runtime OPENBLAS_NUM_THREADS=1 PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/su3-raman/agent.py
+Restart=on-failure
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SU(3) Labs Raman</title>
+<link rel="stylesheet" href="/site.css">
+<script src="/site.js" defer></script>
+<main>
+<header><span class="wordmark">SU(3)</span><span>Labs / Raman instruments</span></header>
+<h1>Raman station</h1>
+<p class="intro">Find peaks and compare a calibrated spectrum with references stored on this instrument.</p>
+<form id="spectrum">
+<label for="file">Spectrum</label>
+<input type="file" id="file" accept=".csv,.txt,.tsv,text/csv,text/plain" required>
+<small>Two columns: Raman shift in cm⁻¹ and intensity.</small>
+<label for="kind">Reference type</label>
+<select id="kind"><option value="measured">Measured spectra</option><option value="computed">Calculated spectra</option><option value="both">Both groups</option></select>
+<div class="actions"><button value="peaks">Find peaks</button><button value="search">Search references</button></div>
+</form>
+<figure id="figure" hidden>
+<svg id="chart" viewBox="0 0 760 200" role="img" aria-label="Uploaded Raman spectrum"></svg>
+<figcaption id="axis"></figcaption>
+</figure>
+<p id="progress" role="status"></p>
+<section id="results" aria-live="polite"></section>
+<details><summary>Reference library and API</summary>
+<ul id="sources"></ul>
+<p>Read <a href="/api/status">device status</a> or the <a href="/openapi.json">API schema</a>. The MCP server is available through an SSH tunnel.</p>
+</details>
+</main>
+</html>

@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+out/
+sources/
+indexes/
+*.img
+*.img.xz
+*.img.zst
+*.tar.gz
+*.nmconnection
+*.pem
+*.key
+setup-passphrase*
+authorized_keys*
