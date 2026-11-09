@@ -2,6 +2,7 @@
 import heapq
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import numpy as np
@@ -134,7 +135,7 @@ class Library:
 
     def candidate(self, score, source, row):
         uri = (self.path / source / "catalog.sqlite").resolve().as_uri()
-        with sqlite3.connect(uri + "?mode=ro&immutable=1", uri=True) as connection:
+        with closing(sqlite3.connect(uri + "?mode=ro&immutable=1", uri=True)) as connection:
             key, name, smiles, provenance = connection.execute(
                 "SELECT ref, name, smiles, provenance FROM reference WHERE rowid=?", (row + 1,)
             ).fetchone()

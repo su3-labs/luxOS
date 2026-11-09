@@ -7,6 +7,8 @@ LuxOS is an open-source Raman instrument system for small ARM64 computers. It la
 | Radxa ZERO 3W | Build an SD image from official Radxa OS Bookworm `rsdk-b1`. |
 | Raspberry Pi | Install on 64-bit Raspberry Pi OS Lite Bookworm or Trixie. The board needs a Wi-Fi interface that supports AP mode. |
 
+The ARM64 runtime is tested on Bookworm and Trixie. Raspberry Pi radio and hotspot behavior still needs a physical board check.
+
 The service takes already calibrated Raman shifts and intensities. It detects peaks and ranks reference spectra on the CPU. The default search uses measured references. Calculated references form a separate group. Match scores express similarity.
 
 ## Radxa ZERO 3W

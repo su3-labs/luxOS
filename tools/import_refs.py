@@ -11,6 +11,7 @@ import sys
 import tempfile
 import zipfile
 import zlib
+from contextlib import closing
 from pathlib import Path
 
 import numpy as np
@@ -134,7 +135,7 @@ def raman_chembl(path):
 
     for database in sorted(path.glob("Raman-ChEMBL-part*.db")):
         uri = database.resolve().as_uri() + "?mode=ro&immutable=1"
-        with sqlite3.connect(uri, uri=True) as connection:
+        with closing(sqlite3.connect(uri, uri=True)) as connection:
             for key, smiles, compressed in connection.execute(
                 "SELECT id, SMILES, blob_data FROM molecule ORDER BY id"
             ):
@@ -159,7 +160,7 @@ def build(sources, output, source, importer):
     stage = Path(tempfile.mkdtemp(prefix=f".{source}.", dir=output))
     count = skipped = 0
     try:
-        with sqlite3.connect(stage / "catalog.sqlite") as db, \
+        with closing(sqlite3.connect(stage / "catalog.sqlite")) as db, db, \
                 (stage / "spectra.f16").open("wb") as spectra, \
                 (stage / "bounds.u16").open("wb") as bounds:
             db.execute("CREATE TABLE reference (ref TEXT NOT NULL, name TEXT, smiles TEXT, provenance TEXT NOT NULL)")

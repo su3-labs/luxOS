@@ -5,6 +5,7 @@ import sqlite3
 import tarfile
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 import numpy as np
@@ -43,7 +44,7 @@ class RuntimeTests(unittest.TestCase):
                 }))
                 packed.astype("<f2").tofile(folder / "spectra.f16")
                 np.array([[lo, hi]], dtype="<u2").tofile(folder / "bounds.u16")
-                with sqlite3.connect(folder / "catalog.sqlite") as db:
+                with closing(sqlite3.connect(folder / "catalog.sqlite")) as db, db:
                     db.execute("CREATE TABLE reference (ref TEXT, name TEXT, smiles TEXT, provenance TEXT)")
                     db.execute("INSERT INTO reference VALUES (?, ?, ?, ?)", ("test", kind, None, "{}"))
             with TestClient(app) as client:
