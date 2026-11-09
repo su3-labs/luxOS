@@ -1,6 +1,0 @@
-# Tested versions on the Radxa ARM64 build.
-numpy==2.4.6
-scipy==1.17.1
-fastapi==0.162.2
-mcp==1.30.0
-uvicorn==0.54.0

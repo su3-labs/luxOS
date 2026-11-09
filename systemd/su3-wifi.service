@@ -5,7 +5,7 @@ Wants=NetworkManager.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /opt/su3-raman/su3-wifi.py
+ExecStart=/opt/su3-raman/luxos wifi-setup
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=yes

@@ -14,3 +14,5 @@ indexes/
 *.key
 setup-passphrase*
 authorized_keys*
+
+/target/

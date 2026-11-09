@@ -8,15 +8,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-          cache: pip
-      - run: python -m pip install -r requirements.txt
-      - run: PYTHONPATH=runtime python -m unittest discover -s tests
+      - run: cargo test --locked
+      - run: cargo fmt --check
       - run: for script in scripts/*.sh; do bash -n "$script"; done

@@ -7,7 +7,6 @@ import json
 import pickle
 import shutil
 import sqlite3
-import sys
 import tempfile
 import zipfile
 import zlib
@@ -17,8 +16,7 @@ from pathlib import Path
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "runtime"))
-from spectra import GRID, INDEX_VERSION, vector
+from preprocess import GRID, INDEX_VERSION, vector
 
 INFO = {
     "arcadia": ("measured", "Arcadia OpenRAMAN", "https://github.com/Arcadia-Science/2025-diyraman-bio"),

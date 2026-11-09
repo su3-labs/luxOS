@@ -16,9 +16,10 @@ trap cleanup EXIT
 mount "$loop" "$root"
 mount --bind /dev "$root/dev"
 mount -t proc proc "$root/proc"
-mkdir "$root/tmp/luxos-source" "$root/tmp/luxos-deps" "$root/tmp/luxos-input"
+mkdir "$root/tmp/luxos-source" "$root/tmp/luxos-input"
 mount --bind /source "$root/tmp/luxos-source"
-mount --bind /luxos-deps "$root/tmp/luxos-deps"
+touch "$root/tmp/luxos-input/luxos"
+mount --bind /luxos-bin/luxos "$root/tmp/luxos-input/luxos"
 install -m 0600 /work/setup-passphrase "$root/tmp/luxos-input/setup-passphrase"
 
 if [[ -e "$root/etc/resolv.conf" || -L "$root/etc/resolv.conf" ]]; then
@@ -50,7 +51,7 @@ if (( ${#missing[@]} )); then
     rm -f "$root/etc/apt/sources.list.d/luxos-build.list" "$root"/var/lib/apt/lists/*_Packages*
 fi
 
-args=(--image-dependencies /tmp/luxos-deps --setup-passphrase-file /tmp/luxos-input/setup-passphrase)
+args=(--image-binary /tmp/luxos-input/luxos --setup-passphrase-file /tmp/luxos-input/setup-passphrase)
 if [[ -f /input-library.tar.gz ]]; then
     touch "$root/tmp/luxos-input/library.tar.gz"
     mount --bind /input-library.tar.gz "$root/tmp/luxos-input/library.tar.gz"
@@ -115,8 +116,8 @@ fi
 if [[ -f /input-library.tar.gz ]]; then
     umount "$root/tmp/luxos-input/library.tar.gz"
 fi
-umount "$root/tmp/luxos-source" "$root/tmp/luxos-deps"
-rm -rf "$root/tmp/luxos-source" "$root/tmp/luxos-deps" "$root/tmp/luxos-input"
+umount "$root/tmp/luxos-source" "$root/tmp/luxos-input/luxos"
+rm -rf "$root/tmp/luxos-source" "$root/tmp/luxos-input"
 find "$root/var/log" -type f -exec truncate -s 0 {} +
 sync
 umount -R "$root"

@@ -1,2 +1,7 @@
 *
-!requirements.txt
+!Cargo.toml
+!Cargo.lock
+!src/
+!src/**
+!runtime/
+!runtime/**

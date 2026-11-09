@@ -78,7 +78,10 @@ form.addEventListener("submit", async event => {
                 group(name === "measured" ? "Measured matches" : "Calculated matches",
                       result.matches[name].map(m => `${m.name || m.smiles || m.reference} · ${m.source} · ${m.score}`));
             }
-            progress.textContent = result.interpretation;
+            const indexed = result.indexed_sources?.length;
+            progress.textContent = indexed
+                ? `Peak index used for ${indexed} reference collection(s). ${result.interpretation}`
+                : result.interpretation;
         }
     } catch (error) {
         progress.textContent = error.message;

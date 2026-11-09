@@ -7,8 +7,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=exec
 User=luxos
-Environment=PYTHONPATH=/opt/su3-raman/runtime OPENBLAS_NUM_THREADS=1
-ExecStart=/usr/bin/python3 /opt/su3-raman/load-library.py
+ExecStart=/opt/su3-raman/luxos load-library
 Restart=on-failure
 RestartSec=30
 NoNewPrivileges=yes

@@ -24,7 +24,8 @@ def main():
                     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", name) or name in ids:
                         raise ValueError(f"Invalid or duplicate collection name: {name}")
                     ids.add(name)
-                    for file in FILES:
+                    names = (*FILES, "peaks.lxo") if (source / "peaks.lxo").exists() else FILES
+                    for file in names:
                         path = source / file
                         if not path.is_file() or path.is_symlink():
                             raise ValueError(f"Missing regular index file: {path}")

@@ -1,5 +1,11 @@
-FROM python:3.11-slim-bookworm
+FROM rust:1.99-bookworm AS compile
+WORKDIR /source
+COPY Cargo.toml Cargo.lock ./
+COPY src src
+COPY runtime runtime
+RUN cargo build --release --locked
+
+FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates e2fsprogs gdisk util-linux && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt /luxos-requirements.txt
-RUN pip install --only-binary=:all: --no-cache-dir --target /luxos-deps -r /luxos-requirements.txt
+COPY --from=compile /source/target/release/luxos /luxos-bin/luxos
