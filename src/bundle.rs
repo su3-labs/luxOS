@@ -1,12 +1,12 @@
 //! Install reference bundles atomically, including existing v1 archives.
 use crate::{postings, search::Manifest, signal::WIDTH};
 use anyhow::{Context, Result, bail, ensure};
-use flate2::read::GzDecoder;
+use flate2::read::MultiGzDecoder;
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs::{self, File},
-    io::{self, BufReader, Seek},
+    io::{self, BufReader, Read, Seek},
     path::{Component, Path, PathBuf},
 };
 
@@ -49,11 +49,18 @@ fn entry_path(path: &Path, is_dir: bool) -> Result<Option<(String, String)>> {
     Ok(Some((id.into(), name.into())))
 }
 
+fn archive<R: Read>(reader: R) -> tar::Archive<MultiGzDecoder<BufReader<R>>> {
+    let mut archive = tar::Archive::new(MultiGzDecoder::new(BufReader::new(reader)));
+    // Additional gzip members can carry independently packed peak sidecars.
+    archive.set_ignore_zeros(true);
+    archive
+}
+
 fn unpack(file: &mut File, into: &Path) -> Result<()> {
     let mut files = BTreeMap::new();
     let mut size = 0_u64;
     {
-        let mut archive = tar::Archive::new(GzDecoder::new(BufReader::new(&mut *file)));
+        let mut archive = archive(&mut *file);
         for entry in archive.entries()? {
             let entry = entry?;
             let ty = entry.header().entry_type();
@@ -91,7 +98,7 @@ fn unpack(file: &mut File, into: &Path) -> Result<()> {
         "Waiting for enough space to unpack the library (need {size} bytes plus headroom)."
     );
     file.rewind()?;
-    let mut archive = tar::Archive::new(GzDecoder::new(BufReader::new(file)));
+    let mut archive = archive(file);
     for entry in archive.entries()? {
         let mut entry = entry?;
         let ty = entry.header().entry_type();
@@ -170,6 +177,46 @@ pub fn install(state: PathBuf) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn append_member(file: &mut File, files: &[(&str, &[u8])]) -> Result<()> {
+        use flate2::{Compression, write::GzEncoder};
+
+        let mut tar = tar::Builder::new(GzEncoder::new(file, Compression::fast()));
+        for &(name, bytes) in files {
+            let mut header = tar::Header::new_ustar();
+            header.set_mode(0o644);
+            header.set_size(bytes.len() as u64);
+            header.set_cksum();
+            tar.append_data(&mut header, name, bytes)?;
+        }
+        tar.into_inner()?.finish()?;
+        Ok(())
+    }
+
+    #[test]
+    fn reads_peak_sidecars_from_a_second_gzip_member() -> Result<()> {
+        let mut bundle = tempfile::tempfile()?;
+        let folder = tempfile::tempdir()?;
+        let postings = folder.path().join(postings::FILE);
+        postings::build(&postings, 1, |_, row| row[40] = 0.8)?;
+        append_member(
+            &mut bundle,
+            &[
+                (
+                    "fixture/manifest.json",
+                    br#"{"version":1,"rows":1,"kind":"measured"}"#,
+                ),
+                ("fixture/catalog.sqlite", b"fixture catalog"),
+                ("fixture/spectra.f16", &[0; WIDTH * 2]),
+                ("fixture/bounds.u16", &[0; 4]),
+            ],
+        )?;
+        append_member(&mut bundle, &[("fixture/peaks.lxo", &fs::read(postings)?)])?;
+        bundle.rewind()?;
+        unpack(&mut bundle, folder.path())?;
+        assert!(folder.path().join("fixture/peaks.lxo").is_file());
+        Ok(())
+    }
+
     #[test]
     fn path_check_rejects_traversal_and_unknown_files() {
         assert!(entry_path(Path::new("source/../manifest.json"), false).is_err());

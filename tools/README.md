@@ -22,7 +22,7 @@ luxos --index /data/raman/indexes build-index
 python tools/pack-library.py /data/raman/indexes/galway --output /data/raman/library.tar.gz
 ```
 
-Repeat the import for each desired source and pass all its index folders to the pack command. Packing includes a peak sidecar when present. Rebuild the sidecar after replacing a source. For Mol2Raman, verify the publisher's checksum and run the importer in an offline, unprivileged container with a read-only source mount. That import requires `--allow-publisher-pickle`.
+Repeat the import for each desired source and pass all its index folders to the pack command. Packing includes a peak sidecar when present. Rebuild the sidecar after replacing a source. An additional gzip-compressed tar member can append sidecars to an existing bundle. Recompute the SHA-256 after appending. For Mol2Raman, verify the publisher's checksum and run the importer in an offline, unprivileged container with a read-only source mount. That import requires `--allow-publisher-pickle`.
 
 The index stores fingerprint-weighted vectors on a shared 200–4000 cm⁻¹ grid. The importer records skipped rows. Raman-ChEMBL Raman activities are converted to relative Stokes intensities using a 785 nm excitation assumption and 298.15 K, with the modeled parameters recorded per entry. QM9S and QMe14S overlap. Spectrum counts include repeated measurements and repeated structures.
 
